@@ -35,14 +35,16 @@ def normalize_filename(path: Path) -> Path:
     if path.name == path.name.lower():
         return path
     new_path = path.with_name(path.name.lower())
-    # Evitar sobrescribir si ya existe un archivo lowercase distinto
     if new_path.exists() and new_path.resolve() != path.resolve():
         print(
             f"  ⚠ Conflicto: ya existe {new_path.name}, no se renombra {path.name}",
             file=sys.stderr,
         )
         return path
-    path.rename(new_path)
+    # Rename en dos pasos: necesario en filesystems case-insensitive
+    tmp = path.with_name(f".__tmp__{path.name}")
+    path.rename(tmp)
+    tmp.rename(new_path)
     print(f"  ✓ Renombrado: {path.relative_to(ROOT)} → {new_path.name}")
     return new_path
 

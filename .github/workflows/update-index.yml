@@ -29,12 +29,12 @@ jobs:
 
       - name: Commit si hay cambios
         run: |
-          if [[ -n "$(git status --porcelain README.md)" ]]; then
+          if [[ -n "$(git status --porcelain)" ]]; then
             git config user.name  "github-actions[bot]"
             git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-            git add README.md
-            git commit -m "chore: actualizar índice de vulnerabilidades [skip ci]"
+            git add -A
+            git commit -m "chore: actualizar índice y normalizar nombres [skip ci]"
             git push
           else
-            echo "Índice ya estaba al día."
+            echo "Sin cambios."
           fi
