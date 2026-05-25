@@ -16,6 +16,6 @@ El repo está organizado por vulnerabilidad bajo la carpeta `vulns/`. Cada vuln 
 
 | Vulnerabilidad | Lenguajes cubiertos | Docs |
 |---|---|---|
-| SQLi | — | [Overview](vulns/SQLi/overview.md) |
+| SQLi | — | — |
 
 <!-- AUTO-INDEX:END -->
