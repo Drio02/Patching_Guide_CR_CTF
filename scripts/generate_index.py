@@ -92,11 +92,11 @@ def build_table(normalize: bool = False) -> str:
 
         title = get_title(docs["overview.md"], vuln.name)
         langs = get_languages(vuln / "samples")
+        rel = vuln.relative_to(ROOT).as_posix()
         if langs:
             langs_str = ", ".join(f"[{lang}]({rel}/samples/{lang}/)" for lang in langs)
         else:
             langs_str = "—"
-        rel = vuln.relative_to(ROOT).as_posix()
 
         docs_links = []
         if docs["overview.md"]:
