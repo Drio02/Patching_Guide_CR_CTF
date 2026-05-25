@@ -24,6 +24,9 @@ jobs:
       - name: Regenerar índice
         run: python scripts/generate_index.py
 
+      - name: Regenerar índice y normalizar nombres
+        run: python scripts/generate_index.py --normalize
+
       - name: Commit si hay cambios
         run: |
           if [[ -n "$(git status --porcelain README.md)" ]]; then

@@ -1,12 +1,13 @@
 #!/usr/bin/env python3
 """Genera el índice de vulnerabilidades en el README.md.
 
-Recorre vulns/, arma una tabla Markdown y la inserta entre los marcadores
-AUTO-INDEX:START / AUTO-INDEX:END del README.
+Detecta overview.md y parche.md sin importar la capitalización. Con --normalize
+renombra esos archivos a minúsculas para mantener consistencia en el repo.
 """
-from pathlib import Path
+import argparse
 import re
 import sys
+from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 VULNS_DIR = ROOT / "vulns"
@@ -15,10 +16,40 @@ README = ROOT / "README.md"
 START = "<!-- AUTO-INDEX:START -->"
 END = "<!-- AUTO-INDEX:END -->"
 
+DOC_FILES = ("overview.md", "parche.md")
 
-def get_title(overview: Path, fallback: str) -> str:
-    """Extrae el primer '# Título' de overview.md, o usa el nombre de carpeta."""
-    if not overview.exists():
+
+def find_ci(directory: Path, target_name: str) -> Path | None:
+    """Busca un archivo en directory ignorando mayúsculas/minúsculas."""
+    if not directory.is_dir():
+        return None
+    target_lower = target_name.lower()
+    for entry in directory.iterdir():
+        if entry.is_file() and entry.name.lower() == target_lower:
+            return entry
+    return None
+
+
+def normalize_filename(path: Path) -> Path:
+    """Renombra el archivo a minúsculas si no lo está. Retorna el path final."""
+    if path.name == path.name.lower():
+        return path
+    new_path = path.with_name(path.name.lower())
+    # Evitar sobrescribir si ya existe un archivo lowercase distinto
+    if new_path.exists() and new_path.resolve() != path.resolve():
+        print(
+            f"  ⚠ Conflicto: ya existe {new_path.name}, no se renombra {path.name}",
+            file=sys.stderr,
+        )
+        return path
+    path.rename(new_path)
+    print(f"  ✓ Renombrado: {path.relative_to(ROOT)} → {new_path.name}")
+    return new_path
+
+
+def get_title(overview: Path | None, fallback: str) -> str:
+    """Extrae el primer '# Título' del overview, o usa el fallback."""
+    if overview is None or not overview.exists():
         return fallback
     for line in overview.read_text(encoding="utf-8").splitlines():
         match = re.match(r"^#\s+(.+)", line.strip())
@@ -28,7 +59,6 @@ def get_title(overview: Path, fallback: str) -> str:
 
 
 def get_languages(samples: Path) -> list[str]:
-    """Lista subcarpetas de samples/ (cada una es un lenguaje)."""
     if not samples.is_dir():
         return []
     return sorted(
@@ -37,7 +67,7 @@ def get_languages(samples: Path) -> list[str]:
     )
 
 
-def build_table() -> str:
+def build_table(normalize: bool = False) -> str:
     rows = [
         "| Vulnerabilidad | Lenguajes cubiertos | Docs |",
         "|---|---|---|",
@@ -50,17 +80,24 @@ def build_table() -> str:
         return "_Todavía no hay vulnerabilidades documentadas._"
 
     for vuln in vulns:
-        title = get_title(vuln / "overview.md", vuln.name)
+        # Buscar cada doc sin importar capitalización; normalizar si se pidió
+        docs: dict[str, Path | None] = {}
+        for fname in DOC_FILES:
+            found = find_ci(vuln, fname)
+            if found and normalize:
+                found = normalize_filename(found)
+            docs[fname] = found
+
+        title = get_title(docs["overview.md"], vuln.name)
         langs = get_languages(vuln / "samples")
         langs_str = ", ".join(langs) if langs else "—"
         rel = vuln.relative_to(ROOT).as_posix()
 
-        # Solo incluir links de archivos que efectivamente existen
         docs_links = []
-        if (vuln / "overview.md").exists():
-            docs_links.append(f"[Overview]({rel}/overview.md)")
-        if (vuln / "parche.md").exists():
-            docs_links.append(f"[Parche]({rel}/parche.md)")
+        if docs["overview.md"]:
+            docs_links.append(f"[Overview]({rel}/{docs['overview.md'].name})")
+        if docs["parche.md"]:
+            docs_links.append(f"[Parche]({rel}/{docs['parche.md'].name})")
         docs_str = " · ".join(docs_links) if docs_links else "—"
 
         rows.append(f"| {title} | {langs_str} | {docs_str} |")
@@ -68,6 +105,14 @@ def build_table() -> str:
 
 
 def main() -> int:
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument(
+        "--normalize",
+        action="store_true",
+        help="Renombra overview.md y parche.md a minúsculas si tienen otra capitalización.",
+    )
+    args = parser.parse_args()
+
     if not README.exists():
         print("ERROR: no se encontró README.md", file=sys.stderr)
         return 1
@@ -81,8 +126,13 @@ def main() -> int:
         print(f"ERROR: marcadores {START} / {END} no están en el README.", file=sys.stderr)
         return 1
 
-    table = build_table()
-    new_block = f"{START}\n<!-- Esta sección se genera automáticamente. No la edites a mano. -->\n\n{table}\n\n{END}"
+    table = build_table(normalize=args.normalize)
+    new_block = (
+        f"{START}\n"
+        f"<!-- Esta sección se genera automáticamente. No la edites a mano. -->\n\n"
+        f"{table}\n\n"
+        f"{END}"
+    )
     new_content = pattern.sub(new_block, content)
 
     if new_content == content:
