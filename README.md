@@ -17,6 +17,6 @@ El repo está organizado por vulnerabilidad bajo la carpeta `vulns/`. Cada vuln 
 | Vulnerabilidad | Lenguajes cubiertos | Docs |
 |---|---|---|
 | IDOR | [C](vulns/IDOR/samples/C/) | [Overview](vulns/IDOR/overview.md) |
-| SQLi | [python](vulns/SQLi/samples/python/) | [Overview](vulns/SQLi/overview.md) · [Parche](vulns/SQLi/parche.md) |
+| SQLi | [C](vulns/SQLi/samples/C/), [python](vulns/SQLi/samples/python/) | [Overview](vulns/SQLi/overview.md) · [Parche](vulns/SQLi/parche.md) |
 
 <!-- AUTO-INDEX:END -->
