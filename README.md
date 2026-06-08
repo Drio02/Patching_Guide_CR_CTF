@@ -17,7 +17,7 @@ El repo está organizado por vulnerabilidad bajo la carpeta `vulns/`. Cada vuln 
 | Vulnerabilidad | Lenguajes cubiertos | Docs |
 |---|---|---|
 | IDOR | [C](vulns/IDOR/samples/C/), [go](vulns/IDOR/samples/go/), [js](vulns/IDOR/samples/js/), [python](vulns/IDOR/samples/python/) | [Overview](vulns/IDOR/overview.md) |
-| Path Traversal | [python](vulns/Path Traversal/samples/python/) | [Overview](vulns/Path Traversal/overview.md) · [Parche](vulns/Path Traversal/parche.md) |
+| Path-Traversal | [python](vulns/Path-Traversal/samples/python/) | [Overview](vulns/Path-Traversal/overview.md) · [Parche](vulns/Path-Traversal/parche.md) |
 | SQLi | [C](vulns/SQLi/samples/C/), [python](vulns/SQLi/samples/python/) | [Overview](vulns/SQLi/overview.md) · [Parche](vulns/SQLi/parche.md) |
 
 <!-- AUTO-INDEX:END -->
