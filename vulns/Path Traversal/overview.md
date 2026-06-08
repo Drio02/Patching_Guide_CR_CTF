@@ -1,0 +1,1 @@
+Es una vulnerabilidad que permite a un atacante acceder a archivos y directorios fuera del directorio previsto, manipulando la entrada que se usa para construir una ruta de archivo. El truco clásico es inyectar secuencias como `../` (o sus variantes codificadas: `..%2f`, `....//`, etc.) para "subir" en el árbol de directorios
