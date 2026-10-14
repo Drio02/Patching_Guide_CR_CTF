@@ -9,6 +9,8 @@ El repo está organizado por vulnerabilidad bajo la carpeta `vulns/`. Cada vuln 
 - **`parche.md`** — estrategia general de patching, errores comunes y recomendaciones de defensa en profundidad.
 - **`samples/<lenguaje>/`** — pares `vulnerable.<ext>` y `parchado.<ext>` listos para comparar lado a lado.
 
+Para una referencia rápida durante el juego (workflow, triage y cheatsheet por lenguaje), ver **[PATCHERS_GUIDE.md](PATCHERS_GUIDE.md)**.
+
 ## Índice de vulnerabiidades
 
 <!-- AUTO-INDEX:START -->
